@@ -2,10 +2,10 @@
 We try out the Confluent Terraform Provider.
 We want to create 
 * Kafka Cluster within an existing Environment
-* Kafka Topic
 * Service Account
 * API Key
-* ACLs to write to that topic
+* Kafka Topic
+* ACLs to write to a topic
 
 Then we want to produce data to that topic with the configured API Key.
 
@@ -17,7 +17,7 @@ terraform {
   required_providers {
     confluent = {
       source  = "confluentinc/confluent"
-      version = "1.1.0"
+      version = "1.2.0"
     }
   }
 }
@@ -39,6 +39,12 @@ terraform apply
 ```
 ```shell
 terraform destroy
+```
+
+To see output variables such as the API Key and Secret that we need to
+execute:
+```shell
+terraform output api_secret
 ```
 
 ## Resources
