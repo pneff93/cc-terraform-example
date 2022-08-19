@@ -92,6 +92,7 @@ resource "confluent_api_key" "pn-tf-clients-key" {
 }
 
 # Create ACLs to create, write and read from a Kafka Topic
+# for the Clients Service Account
 resource "confluent_kafka_acl" "operate-topic" {
   kafka_cluster {
     id = confluent_kafka_cluster.basic.id
@@ -110,19 +111,37 @@ resource "confluent_kafka_acl" "operate-topic" {
   }
 }
 
-## Create Kafka Topic
-#resource "confluent_kafka_topic" "test-tf-topic" {
-#  kafka_cluster {
-#    id = confluent_kafka_cluster.basic.id
-#  }
-#  topic_name         = "test-tf-topic"
-#  partitions_count   = 6
-#  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
-#  config = {
-#    "cleanup.policy"    = "compact"
-#  }
-#  credentials {
-#    key    = confluent_api_key.pn-tf-sa-kafka-api-key.id
-#    secret = confluent_api_key.pn-tf-sa-kafka-api-key.secret
-#  }
-#}
+resource "confluent_kafka_acl" "consume-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  resource_type = "GROUP"
+  resource_name = "test-group"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.pn-tf-clients.id}"
+  host          = "*"
+  operation     = "READ"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
+  credentials {
+    key    = confluent_api_key.pn-tf-cloud-admin-key.id
+    secret = confluent_api_key.pn-tf-cloud-admin-key.secret
+  }
+}
+
+# Create Kafka Topic by Clients Service Account
+resource "confluent_kafka_topic" "test-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  topic_name         = "test-topic"
+  partitions_count   = 6
+  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
+  config = {
+    "cleanup.policy"    = "compact"
+  }
+  credentials {
+    key    = confluent_api_key.pn-tf-clients-key.id
+    secret = confluent_api_key.pn-tf-clients-key.secret
+  }
+}

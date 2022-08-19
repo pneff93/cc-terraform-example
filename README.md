@@ -4,7 +4,7 @@ We want to create
 * Kafka Cluster within an existing Environment
 * Service Account (Admin and Client)
 * API Keys (Admin and Client)
-* ACLs provided by the Admin to the Client to write and create a Kafka Topic
+* ACLs provided by the Admin to the Client to create, write, and read a Kafka Topic
 * Kafka Topic
 
 Then we want to produce and consume data to that topic with the configured API Key.
@@ -43,7 +43,7 @@ terraform apply
 terraform destroy
 ```
 
-To see output variables such as the API Key and Secret that we need to
+To see output variables such as the API Key and Secret, we need to
 execute:
 ```shell
 terraform output api_secret
@@ -52,21 +52,30 @@ terraform output api_secret
 ## Confluent CLI to validate resources
 
 We need to login and use the desired environment and cluster with the Confluent CLI.
-Then we can check the Service Accounts by:
+Then we can see all resources by:
 
 ```shell
 confluent iam service-account list
-```
-We also see the created API keys by: 
+``` 
 ```shell
 confluent api-key list --resource <clusterId>
 ```
-And the ACLs:
 ```shell
 confluent kafka acl list
 ```
+```shell
+confluent kafka topic list --cluster <clusterId>
+```
 
 ## Produce and Consume data
+Before producing or consuming data edit the appropriate [client.properties](client.properties).
+```shell
+kafka-console-producer  --broker-list <brokerId> --topic test-topic --producer.config client.properties --property "parse.key=true" --property "key.separator=:"
+```
+
+```shell
+kafka-console-consumer --bootstrap-server <brokerId> --topic test-topic --consumer.config client.properties --group test-group --from-beginning
+```
 
 ## Resources
 * [Confluent Docu](https://docs.confluent.io/cloud/current/get-started/terraform-provider.html)
