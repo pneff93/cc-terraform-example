@@ -141,7 +141,7 @@ resource "confluent_kafka_topic" "test-topic" {
     "cleanup.policy"    = "compact"
   }
   credentials {
-    key    = confluent_api_key.pn-tf-clients-key.id
-    secret = confluent_api_key.pn-tf-clients-key.secret
+    key    = confluent_api_key.pn-tf-cloud-admin-key.id
+    secret = confluent_api_key.pn-tf-cloud-admin-key.secret
   }
 }

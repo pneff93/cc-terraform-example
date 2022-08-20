@@ -12,3 +12,8 @@ output "api_secret" {
   value = confluent_api_key.pn-tf-clients-key.secret
   sensitive = true
 }
+
+output "bootstrap_server" {
+  description = "Bootstrap Server"
+  value = confluent_kafka_cluster.basic.bootstrap_endpoint
+}
