@@ -3,16 +3,6 @@ output "cluster-id"{
   value = confluent_kafka_cluster.basic.id
 }
 
-output "api_key" {
-  description = "API Key"
-  value = confluent_api_key.pn-tf-clients-key.id
-}
-output "api_secret" {
-  description = "API Secret"
-  value = confluent_api_key.pn-tf-clients-key.secret
-  sensitive = true
-}
-
 output "bootstrap_server" {
   description = "Bootstrap Server"
   value = confluent_kafka_cluster.basic.bootstrap_endpoint
