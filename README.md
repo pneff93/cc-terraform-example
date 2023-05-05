@@ -1,4 +1,4 @@
-# Kafka Terraform Example
+# Confluent Cloud Terraform Example
 We try out the [Confluent Terraform Provider](https://docs.confluent.io/cloud/current/get-started/terraform-provider.html).
 We want to create 
 * Kafka Cluster within an existing Environment
