@@ -1,83 +1,41 @@
 # Confluent Cloud Terraform Example
 We try out the [Confluent Terraform Provider](https://docs.confluent.io/cloud/current/get-started/terraform-provider.html).
-We want to create 
-* Kafka Cluster within an existing Environment
-* Service Account (Admin and Client)
-* API Keys (Admin and Client)
-* ACLs provided by the Admin to the Client to create, write, and read a Kafka Topic
-* Kafka Topic
+In addition, we want to try out the [api-key-rotation module](https://registry.terraform.io/modules/nerdynick/api-key-rotation/confluent/latest).
 
-Then we want to produce and consume data to that topic with the configured API Key.
+## Resources
+* [Documentation](https://registry.terraform.io/modules/nerdynick/api-key-rotation/confluent/latest)
+* [GitHUb Repository Example](https://github.com/nerdynick/terraform-confluent-api-key-rotation)
+
 
 ## Run Terraform
 
-Add the provider so that we have the Confluent Terraform Provider
-```terraform
-terraform {
-  required_providers {
-    confluent = {
-      source  = "confluentinc/confluent"
-      version = "1.2.0"
-    }
-  }
-}
-```
-
 We encrypted sensitive information (variables.tf) with [Blackbox](https://github.com/StackExchange/blackbox).
-This contains the `environment id`, as well as the `cloud API key` and `cloud API secret`.
+This contains the `cloud API key` and `cloud API secret`.
 
-Initialize Terraform for that project:
-```shell
-terraform init
-```
+Due to the limitation of Terraform and Time Based rotation. You must execute th module on a regular bases that is equal to or less than the configured number of days to rotate
 
-Then we always work with:
+Checking the code, it seems that `ttl` days are converted into hours and when
+applying the module it compares if we need to re-create a key based on the current time.
 
-```shell
-terraform plan
-```
-```shell
+
+```terraform
 terraform apply
 ```
-```shell
-terraform destroy
+
+## API Keys at day 0
+
+Check active key with
+```terraform
+terraform output active-API-key
 ```
 
-To see output variables such as the API Key and Secret, we need to
-execute:
-```shell
-terraform output api_secret
-```
+![](APIKeys-d_0.png)
 
-## Confluent CLI to validate resources
+## API Keys at day 1 ( > 24 hours = 1 day ttl)
 
-We need to login and use the desired environment and cluster with the Confluent CLI.
-Then we can see all resources by:
+We need to execute the Terraform script again.
+* The old active key is deleted
+* The other key becomes the new active key
+* Another key is created
 
-```shell
-confluent iam service-account list
-``` 
-```shell
-confluent api-key list --resource <clusterId>
-```
-```shell
-confluent kafka acl list
-```
-```shell
-confluent kafka topic list --cluster <clusterId>
-```
-
-## Produce and Consume data
-Before producing or consuming data edit the appropriate [client.properties](client.properties).
-```shell
-kafka-console-producer  --broker-list <brokerId> --topic test-topic --producer.config client.properties --property "parse.key=true" --property "key.separator=:"
-```
-
-```shell
-kafka-console-consumer --bootstrap-server <brokerId> --topic test-topic --consumer.config client.properties --group test-group --from-beginning
-```
-
-## Resources
-* [Confluent Docu](https://docs.confluent.io/cloud/current/get-started/terraform-provider.html)
-* [Example](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/guides/sample-project)
-* [Example main.tf](https://github.com/confluentinc/terraform-provider-confluent/blob/master/examples/configurations/basic-kafka-acls/main.tf)
+![](APIKeys-d_1.png)

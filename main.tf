@@ -3,7 +3,7 @@ terraform {
   required_providers {
     confluent = {
       source  = "confluentinc/confluent"
-      version = "1.2.0"
+      version = "1.34.0"
     }
   }
 }
@@ -14,134 +14,53 @@ provider "confluent" {
   cloud_api_secret = var.confluent_cloud_api_secret
 }
 
+# Environment
+data "confluent_environment" "confluent_cloud_environment" {
+  id = "t39221"
+}
+
 # Create cluster within Environment
 resource "confluent_kafka_cluster" "basic" {
   display_name = "pn-tf"
   availability = "SINGLE_ZONE"
-  cloud        = "AWS"
-  region       = "eu-central-1"
+  cloud        = "AZURE"
+  region       = "centralus"
   basic {}
 
   environment {
-    id = var.confluent_cloud_environment_id
+    id = data.confluent_environment.confluent_cloud_environment.id
   }
 }
 
-# Admin
-# Create Service Account as an Admin
-resource "confluent_service_account" "pn-tf-cloud-admin" {
-  display_name = "pn-tf-cloud-admin"
-  description  = "Service account to administrate the cluster"
+# Create Service Account
+resource "confluent_service_account" "pn-tf-sa" {
+  display_name = "pn-tf-sa-api-key-rotation"
+  description  = "Service account for API key rotation"
 }
 
-# Set CloudClusterAdmin Role to Admin Account
-resource "confluent_role_binding" "pn-tf-cloud-admin" {
-  principal   = "User:${confluent_service_account.pn-tf-cloud-admin.id}"
-  role_name   = "CloudClusterAdmin"
-  crn_pattern = confluent_kafka_cluster.basic.rbac_crn
-}
+module "api-key-rotation" {
+  source  = "nerdynick/api-key-rotation/confluent"
+  version = "0.1.0"
 
-# Create API Key for the Admin Account
-resource "confluent_api_key" "pn-tf-cloud-admin-key" {
-  display_name = "pn-tf-cloud-admin-key"
-  description  = "Kafka API Key that is owned by pn-tf-cloud-admin Service Account"
-  owner {
-    id          = confluent_service_account.pn-tf-cloud-admin.id
-    api_version = confluent_service_account.pn-tf-cloud-admin.api_version
-    kind        = confluent_service_account.pn-tf-cloud-admin.kind
+  # Required Inputs for Kafka cluster API key
+  owner = {
+    id          = confluent_service_account.pn-tf-sa.id
+    api_version = confluent_service_account.pn-tf-sa.api_version
+    kind        = confluent_service_account.pn-tf-sa.kind
   }
 
-  managed_resource {
+  resource = {
     id          = confluent_kafka_cluster.basic.id
     api_version = confluent_kafka_cluster.basic.api_version
     kind        = confluent_kafka_cluster.basic.kind
 
-    environment {
-      id = var.confluent_cloud_environment_id
+    environment = {
+      id = data.confluent_environment.confluent_cloud_environment.id
     }
   }
-}
 
-
-# Clients
-# Create Service Account for Clients
-resource "confluent_service_account" "pn-tf-clients" {
-  display_name = "pn-tf-clients"
-  description  = "Service Account for Producer and Consumer Clients"
-}
-
-# Create API Key for that Service Account
-resource "confluent_api_key" "pn-tf-clients-key" {
-  display_name = "pn-tf-clients-key"
-  description  = "Kafka API Key that is owned by pn-tf-clients Service Account"
-  owner {
-    id          = confluent_service_account.pn-tf-clients.id
-    api_version = confluent_service_account.pn-tf-clients.api_version
-    kind        = confluent_service_account.pn-tf-clients.kind
-  }
-
-  managed_resource {
-    id          = confluent_kafka_cluster.basic.id
-    api_version = confluent_kafka_cluster.basic.api_version
-    kind        = confluent_kafka_cluster.basic.kind
-
-    environment {
-      id = var.confluent_cloud_environment_id
-    }
-  }
-}
-
-# Create ACLs to create, write and read from a Kafka Topic
-# for the Clients Service Account
-resource "confluent_kafka_acl" "operate-topic" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
-  }
-  resource_type = "TOPIC"
-  resource_name = "*"
-  pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.pn-tf-clients.id}"
-  host          = "*"
-  operation     = "ALL"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
-  credentials {
-    key    = confluent_api_key.pn-tf-cloud-admin-key.id
-    secret = confluent_api_key.pn-tf-cloud-admin-key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "consume-topic" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
-  }
-  resource_type = "GROUP"
-  resource_name = "test-group"
-  pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.pn-tf-clients.id}"
-  host          = "*"
-  operation     = "READ"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
-  credentials {
-    key    = confluent_api_key.pn-tf-cloud-admin-key.id
-    secret = confluent_api_key.pn-tf-cloud-admin-key.secret
-  }
-}
-
-# Create Kafka Topic by Clients Service Account
-resource "confluent_kafka_topic" "test-topic" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
-  }
-  topic_name         = "test-topic"
-  partitions_count   = 6
-  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
-  config = {
-    "cleanup.policy"    = "compact"
-  }
-  credentials {
-    key    = confluent_api_key.pn-tf-cloud-admin-key.id
-    secret = confluent_api_key.pn-tf-cloud-admin-key.secret
-  }
+  # Optional Inputs for the key rotation
+  key_display_name = "Service Account API Key - {date} - Managed by Terraform"
+  num_keys_to_retain = 2
+  roll_ttl_days = 1
 }
