@@ -4,7 +4,7 @@ In addition, we want to try out the [api-key-rotation module](https://registry.t
 
 ## Resources
 * [Documentation](https://registry.terraform.io/modules/nerdynick/api-key-rotation/confluent/latest)
-* [GitHUb Repository Example](https://github.com/nerdynick/terraform-confluent-api-key-rotation)
+* [GitHub Repository Example](https://github.com/nerdynick/terraform-confluent-api-key-rotation)
 
 
 ## Run Terraform
