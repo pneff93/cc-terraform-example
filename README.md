@@ -1,21 +1,31 @@
-# Kafka Terraform Example
+# Confluent Cloud Terraform Example
 We try out the [Confluent Terraform Provider](https://docs.confluent.io/cloud/current/get-started/terraform-provider.html).
-We want to create 
+We want to create a simple setup consisting 
+
+* Service Accounts with corresponding permission scope
 * Kafka Cluster within an existing Environment
-by a SA having [EnvironmentAdmin Role](https://docs.confluent.io/cloud/current/access-management/access-control/cloud-rbac.html#environmentadmin)
+* Several Kafka Topics
+
+To do so, we define three scope levels
+* Organization
+* Environment
+* Cluster
+
+In the organization level, we create all SA since we need OrgAdmin/Account Admin role binding.
+On the environment one, all actions are executed 
+by a SA having EnvironmentAdmin Role or CloudClusterAdmin, respectively.
+
 
 ## Prerequisites
 
-* Create SA and assign EnvironmentAdmin Role
-* Create Cloud API Key for this SA
+* Have an account with OrgAdmin/Account Admin role binding and a Cloud API Key/Secret
 
 
 ## Run Terraform
 
 We encrypted sensitive information (variables.tf) with [Blackbox](https://github.com/StackExchange/blackbox).
-This contains the `environment id`, as well as the `cloud API key` and `cloud API secret`.
 
-Initialize Terraform for that project:
+Initialize Terraform for that project (for each scope level):
 ```shell
 terraform init
 ```
