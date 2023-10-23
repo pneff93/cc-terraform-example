@@ -1,0 +1,41 @@
+variable "confluent_cloud_environment_id" {
+  description = "Confluent Cloud Environment Id"
+  type = string
+  sensitive = true
+  default = "<>"
+}
+
+variable "confluent_cloud_cluster_id" {
+  description = "Confluent Cloud Cluster Id"
+  type = string
+  sensitive = true
+  default = "<>"
+}
+
+variable "confluent_cloud_api_key" {
+  description = "Confluent Cloud API Key by CloudClusterAdmin -> from OrgLevel"
+  type = string
+  default = "<>"
+  sensitive = true
+}
+
+variable "confluent_cloud_api_secret" {
+  description = "Confluent Cloud API Secret by CloudClusterAdmin -> from OrgLevel"
+  type = string
+  default = "<>"
+  sensitive = true
+}
+
+variable "confluent_cluster_api_key" {
+  description = "Confluent Cluster API Key by CloudClusterAdmin -> from EnvironmentLevel"
+  type = string
+  default = "<>"
+  sensitive = true
+}
+
+variable "confluent_cluster_api_secret" {
+  description = "Confluent Cluster API Secret by CloudClusterAdmin --> from EnvironmentLevel"
+  type = string
+  default = "<>"
+  sensitive = true
+}
