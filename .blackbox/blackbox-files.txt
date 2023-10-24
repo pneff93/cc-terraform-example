@@ -1,3 +1,2 @@
 cluster-level/variables.tf
 environment-level/variables.tf
-org-level/variables.tf
