@@ -1,6 +1,6 @@
 # Existing environment
 data "confluent_environment" "env" {
-  id = var.confluent_cloud_environment_id
+  id = var.environment_id
 }
 
 # Create SA

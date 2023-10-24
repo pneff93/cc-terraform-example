@@ -1,26 +1,22 @@
-variable "confluent_cloud_environment_id" {
+variable "environment_id" {
   description = "Confluent Cloud Environment Id"
   type = string
   sensitive = true
-  default = "<>"
 }
 
-variable "confluent_cloud_api_key" {
+variable "cloud_api_key" {
   description = "Confluent Cloud API Key by EnvAdmin"
   type = string
-  default = "<>"
   sensitive = true
 }
 
-variable "confluent_cloud_api_secret" {
+variable "cloud_api_secret" {
   description = "Confluent Cloud API Secret by EnvAdmin"
   type = string
-  default = "<>"
   sensitive = true
 }
 
-variable "confluent_sa_cluster_admin" {
+variable "cluster_sa" {
   description = "SA that will be the Cluster Admin"
   type = string
-  default = "<>"
 }

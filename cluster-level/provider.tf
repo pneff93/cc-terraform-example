@@ -8,8 +8,8 @@ terraform {
   }
 }
 
-# Authenticate
+# Authenticate with Cluster Admin Cloud Key
 provider "confluent" {
-  cloud_api_key    = var.confluent_cloud_api_key
-  cloud_api_secret = var.confluent_cloud_api_secret
+  cloud_api_key    = var.cloud_api_key
+  cloud_api_secret = var.cloud_api_secret
 }

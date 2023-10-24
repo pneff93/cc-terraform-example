@@ -11,7 +11,7 @@ To do so, we define three scope levels
 * Environment
 * Cluster
 
-In the organization level, we create all SA since we need OrgAdmin/Account Admin role binding.
+In the organization level, we create all SA since we need OrgAdmin/AccountAdmin role binding.
 On the environment one, all actions are executed 
 by a SA having EnvironmentAdmin Role or CloudClusterAdmin, respectively.
 

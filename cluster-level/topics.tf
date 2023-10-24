@@ -1,8 +1,8 @@
 # Existing cluster
 data "confluent_kafka_cluster" "cluster" {
-  id = var.confluent_cloud_cluster_id
+  id = var.cc_cluster_id
   environment {
-    id = var.confluent_cloud_environment_id
+    id = var.environment_id
   }
 }
 
@@ -14,8 +14,8 @@ resource "confluent_kafka_topic" "orders" {
   topic_name         = "orders"
   rest_endpoint      = data.confluent_kafka_cluster.cluster.rest_endpoint
   credentials {
-    key    = var.confluent_cluster_api_key
-    secret = var.confluent_cluster_api_secret
+    key    = var.cluster_api_key
+    secret = var.cluster_api_secret
   }
 }
 
@@ -26,7 +26,7 @@ resource "confluent_kafka_topic" "payments" {
   topic_name         = "payments"
   rest_endpoint      = data.confluent_kafka_cluster.cluster.rest_endpoint
   credentials {
-    key    = var.confluent_cluster_api_key
-    secret = var.confluent_cluster_api_secret
+    key    = var.cluster_api_key
+    secret = var.cluster_api_secret
   }
 }

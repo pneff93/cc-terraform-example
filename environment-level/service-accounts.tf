@@ -1,13 +1,14 @@
 # Existing SA
 data "confluent_service_account" "cluster-sa" {
-  id = var.confluent_sa_cluster_admin
+  id = var.cluster_sa
 }
 
 # Set CloudClusterAdmin to pn-tf-cluster-admin SA
 resource "confluent_role_binding" "app-manager-kafka-cluster-admin" {
-  principal   = "User:${var.confluent_sa_cluster_admin}"
+  principal   = "User:${var.cluster_sa}"
   role_name   = "CloudClusterAdmin"
   crn_pattern = confluent_kafka_cluster.basic.rbac_crn
+
 }
 
 # Create Cluster API Key for the SA (needed for Cluster interaction e.g. topic creation)
@@ -25,7 +26,7 @@ resource "confluent_api_key" "pn-tf-kafka-key-kafka-cluster-admin" {
     kind        = confluent_kafka_cluster.basic.kind
 
     environment {
-      id = var.confluent_cloud_environment_id
+      id = var.environment_id
     }
   }
 }

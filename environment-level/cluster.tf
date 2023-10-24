@@ -7,6 +7,6 @@ resource "confluent_kafka_cluster" "basic" {
   basic {}
 
   environment {
-    id = var.confluent_cloud_environment_id
+    id = var.environment_id
   }
 }
