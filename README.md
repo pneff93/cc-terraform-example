@@ -20,6 +20,11 @@ by a SA having EnvironmentAdmin Role or CloudClusterAdmin, respectively.
 
 * Have an account with OrgAdmin/Account Admin role binding and a Cloud API Key/Secret
 
+## Other Branches
+| **Branch**                                                                                  | **Feature**                                                                                                                                                        |
+|---------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [api_key_rotation](https://github.com/pneff93/cc-terraform-example/tree/api_key_rotation)   | Testing [api-key-rotationmodule](https://registry.terraform.io/modules/nerdynick/api-key-rotation/confluent/latest)                                                |
+| [resource_importer](https://github.com/pneff93/cc-terraform-example/tree/resource_importer) | Testing [Resource Importer for Confluent Terraform Provider](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/guides/resource-importer)  |
 
 ## Run Terraform
 
